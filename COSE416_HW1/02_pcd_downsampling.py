@@ -14,7 +14,7 @@ voxel_size = 0.1  # 필요에 따라 voxel 크기를 조정 (원래:0.5) -> 너�
 voxel_downsample_pcd = original_pcd.voxel_down_sample(voxel_size=voxel_size)
 
 # Statistical Outlier Removal (SOR) 적용
-cl, ind = voxel_downsample_pcd.remove_statistical_outlier(nb_neighbors=15, std_ratio=1.2)
+cl, ind = voxel_downsample_pcd.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.0)
 sor_downsampled_pcd = voxel_downsample_pcd.select_by_index(ind)
 
 # Radius Outlier Removal (ROR) 적용
