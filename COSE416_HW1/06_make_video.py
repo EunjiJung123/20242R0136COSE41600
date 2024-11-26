@@ -9,6 +9,7 @@ import hdbscan
 
 file_names = ['01_straight_walk','02_straight_duck_walk','03_straight_crawl','04_zigzag_walk','05_straight_duck_walk','06_straight_crawl','07_straight_walk']
 
+# 사용할 folder에 따라 pcd_folder 값 바꾸기
 pcd_folder = '../data/01_straight_walk/pcd/'
 pcd_files = sorted(glob.glob(pcd_folder + "*.pcd"))
 pcd_files = pcd_files[:10]
@@ -44,6 +45,7 @@ def apply_hdbscan_clustering(point_cloud, min_cluster_size=11, min_samples=None)
     return labels
 
 # 카메라 위치 및 뷰포인트 설정 함수
+# def set_camera_view(vis, zoom=0.1, front=[0, -1, 0.2], lookat=[-0.5, 0, 0.5], up=[0, 0, 1]):
 def set_camera_view(vis, zoom=0.08, front=[0, -1, 0.2], lookat=[-0.5, 0, 0.5], up=[0, 0, 1]):
     ctr = vis.get_view_control()
     ctr.set_zoom(zoom)  # 줌 인/아웃 설정
@@ -69,7 +71,7 @@ for pcd_file in pcd_files:
 
     # HDBSCAN을 사용해 클러스터링 진행
     with o3d.utility.VerbosityContextManager(o3d.utility.VerbosityLevel.Debug) as cm:
-        labels = np.array(apply_hdbscan_clustering(final_point, min_cluster_size=11))
+        labels = np.array(apply_hdbscan_clustering(final_point, min_cluster_size=11, min_samples=5))
 
     max_label = labels.max()
     # 노이즈 포인트는 검정색, 클러스터 포인트는 파란색으로 지정
@@ -79,31 +81,37 @@ for pcd_file in pcd_files:
 
     # 바운딩 박스 필터링 (기존 코드 활용)
     # 클러스터 내 최대 최소 포인트 수
-    min_points_in_cluster = 5
-    max_points_in_cluster = 40
+    min_points_in_cluster = 1
+    max_points_in_cluster = 100
 
-    # 클러스터 내 최소 최대 Z값
+    # 클러스터 내 최대 최소 Z값
     min_z_value = -1.5
-    max_z_value = 2.5
+    max_z_value = 3.0
+
+    # 클러스터 내 최대 최소 x, y 범위(너비)
+    width_x = 1.0
+    width_y = 1.0
 
     # 클러스터 내 최소 최대 Z값 차이
-    min_height = 0.5
-    max_height = 2.0
+    min_height = 1.0
+    max_height = 2.5
 
-    max_distance = 30.0  # 원점으로부터의 최대 거리
+    max_distance = 80.0  # 원점으로부터의 최대 거리
 
     bboxes_1234 = []
-    for i in range(max_label + 1):
+    for i in range(labels.max() + 1):
         cluster_indices = np.where(labels == i)[0]
         if min_points_in_cluster <= len(cluster_indices) <= max_points_in_cluster:
             cluster_pcd = final_point.select_by_index(cluster_indices)
             points = np.asarray(cluster_pcd.points)
-            z_values = points[:, 2]  # Z값 추출
+            z_values = points[:, 2]
             z_min = z_values.min()
             z_max = z_values.max()
-            if min_z_value <= z_min and z_max <= max_z_value:
+            x_diff = max(points[:, 0]) - min(points[:, 0])
+            y_diff = max(points[:, 1]) - min(points[:, 1])
+            if min_z_value <= z_min <= 1.5 and 0 <= z_max <= max_z_value:
                 height_diff = z_max - z_min
-                if min_height <= height_diff <= max_height:
+                if min_height <= height_diff <= max_height and 0 <= x_diff <= width_x and 0 <= y_diff <= width_y and 0 <= height_diff/x_diff <= 10:
                     distances = np.linalg.norm(points, axis=1)
                     if distances.max() <= max_distance:
                         bbox = cluster_pcd.get_axis_aligned_bounding_box()
@@ -119,7 +127,7 @@ for pcd_file in pcd_files:
     # 렌더링 옵션 설정
     render_option = vis.get_render_option()
     render_option.point_size = 0.5  # 점 크기를 기본값(1.0)보다 작게 설정
-    render_option.background_color = np.asarray([0, 0, 0])  # 검은색 배경 설정 (선택 사항)
+    # render_option.background_color = np.asarray([0, 0, 0])  # 검은색 배경 설정 (선택 사항)
 
     # 카메라 뷰 설정
     set_camera_view(vis)
