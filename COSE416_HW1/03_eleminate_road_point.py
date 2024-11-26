@@ -1,3 +1,4 @@
+# practice code
 # 시각화에 필요한 라이브러리 불러오기
 import open3d as o3d
 import numpy as np
