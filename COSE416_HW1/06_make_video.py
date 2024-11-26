@@ -7,6 +7,8 @@ import glob
 import os
 import hdbscan
 
+file_names = ['01_straight_walk','02_straight_duck_walk','03_straight_crawl','04_zigzag_walk','05_straight_duck_walk','06_straight_crawl','07_straight_walk']
+
 pcd_folder = '../data/01_straight_walk/pcd/'
 pcd_files = sorted(glob.glob(pcd_folder + "*.pcd"))
 pcd_files = pcd_files[:10]
