@@ -13,7 +13,7 @@ voxel_size = 0.1  # 필요에 따라 voxel 크기를 조정
 downsample_pcd = original_pcd.voxel_down_sample(voxel_size=voxel_size)
 
 # Radius Outlier Removal (ROR) 적용
-cl, ind = downsample_pcd.remove_radius_outlier(nb_points=20, radius=1.0)
+cl, ind = downsample_pcd.remove_radius_outlier(nb_points=15, radius=1.2)
 ror_pcd = downsample_pcd.select_by_index(ind)
 
 # RANSAC을 사용하여 평면 추정
