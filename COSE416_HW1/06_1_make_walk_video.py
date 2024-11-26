@@ -1,3 +1,4 @@
+# video로 나타낸 data 중 '01_straight_walk'은 이 코드로 수행
 # 시각화에 필요한 라이브러리 불러오기
 import open3d as o3d
 import numpy as np
