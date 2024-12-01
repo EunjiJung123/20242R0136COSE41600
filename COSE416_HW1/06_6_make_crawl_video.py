@@ -13,8 +13,8 @@ file_names = ['01_straight_walk','02_straight_duck_walk','03_straight_crawl','04
 # 사용할 folder에 따라 pcd_folder 값 바꾸기
 pcd_folder = '../data/06_straight_crawl/pcd/'
 pcd_files = sorted(glob.glob(pcd_folder + "*.pcd"))
-start_point = -1 * (len(pcd_files)//2)
-pcd_files = pcd_files[start_point:] # test code
+# start_point = -1 * (len(pcd_files)//2)
+# pcd_files = pcd_files[start_point:] # test code
 
 # 비디오 저장 설정
 video_filename = "../videos/06_straight_crawl.avi"
@@ -49,7 +49,7 @@ def set_camera_view(vis, zoom=0.1, front=[0, -1, 0.1], lookat=[3, 20, 0], up=[0,
 cluster_centroids_history = {}
 
 # 이동 거리 기준 (클러스터가 사람인지 판단할 때 사용)
-movement_threshold = 0.3  # 클러스터가 움직였다고 판단하는 최소 이동 거리
+movement_threshold = 0.2  # 클러스터가 움직였다고 판단하는 최소 이동 거리
 
 # 루프를 통해 각 PCD 파일 처리
 for frame_idx, pcd_file in enumerate(pcd_files):
@@ -140,10 +140,10 @@ for frame_idx, pcd_file in enumerate(pcd_files):
                 width, height, depth = bbox_extent
                 if not (-1.5 <= z_min < 1.0) :
                     continue
-                if not (z_max < 3.0):
+                if not (z_max < 1.0):
                     continue
                 z_diff = z_max - z_min
-                if not (0.4 < width < 1.5) or not (0.0 < z_diff < 2.5):
+                if not (0.4 < width < 1.5) or not (0.0 < z_diff < 1.5):
                     continue  # 크기가 사람 범위를 벗어남
 
                 # 조건을 만족한 클러스터만 추가

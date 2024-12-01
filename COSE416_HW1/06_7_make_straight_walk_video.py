@@ -38,7 +38,7 @@ def apply_hdbscan_clustering(point_cloud, min_cluster_size=11, min_samples=None)
     return labels
 
 # 카메라 위치 및 뷰포인트 설정 함수
-def set_camera_view(vis, zoom=0.1, front=[0, -1, 0.1], lookat=[3, 20, 0], up=[0, 0, 1]):
+def set_camera_view(vis, zoom=0.1, front=[0, -1, 0.1], lookat=[0, 15, 0], up=[0, 0, 1]):
     ctr = vis.get_view_control()
     ctr.set_zoom(zoom)  # 줌 인/아웃 설정
     ctr.set_front(front)  # 카메라가 바라보는 방향
@@ -132,18 +132,18 @@ for frame_idx, pcd_file in enumerate(pcd_files):
                 z_min = min(points[:, 2])
 
                 # 클러스터 포인트 수 제한
-                if not (5 <= len(cluster_indices) <= 200): #or not (distances.max() <= 100.0):
+                if not (5 <= len(cluster_indices) <= 250): #or not (distances.max() <= 100.0):
                     continue
 
                 # 조건 2: 사람의 위치, 크기 필터링
                 bbox_extent = bbox.get_extent()  # (너비, 높이, 깊이)
                 width, height, depth = bbox_extent
-                if not (z_min < 2.0) :
+                if not (z_min > -1.0) :
                     continue
-                if not (z_max < 4.0):
+                if not (z_max < 3.5):
                     continue
                 z_diff = z_max - z_min
-                if not (0.05 < width < 1.5) or not (0.5 < z_diff < 2.5):
+                if not (0.3 < width < 1.5) or not (0.5 < z_diff < 2.5):
                     continue  # 크기가 사람 범위를 벗어남
 
                 # 조건을 만족한 클러스터만 추가
